@@ -1,0 +1,22 @@
+{
+    "debug" : {
+        "show vectors" : true
+    },
+
+    "display" : {
+        "background color" : "#ffffff",
+        "car color" : "#e01616ff",
+        "show car trail" : false
+    },
+
+    "car" : {
+        "top speed" : 10,
+        "acceleration" : 0.3,
+        "braking force" : 0.4,
+        "base deceleration" : 0.05,
+        "steering response" : 5,
+        "base grip" : 0.07,
+        "angle snap threshold" : 1,
+        "max angle delta" : 180
+    }
+}

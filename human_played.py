@@ -1,5 +1,10 @@
 import pygame as pg
 from car import *
+import json
+
+# Import config file
+with open('configs.json') as config_file:
+    configs = json.load(config_file)
 
 # Create a window
 pg.init()
@@ -42,7 +47,7 @@ while True:
     car.move(throttle_input, steering_input)
 
     # Display everything
-    window.fill('#ffffff')
+    window.fill(configs['display']['background color'])
     car.display(ticks_passed)
     pg.display.flip()
 

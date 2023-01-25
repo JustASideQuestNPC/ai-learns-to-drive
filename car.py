@@ -1,5 +1,10 @@
 import pygame as pg
 import shapely
+import json
+
+# Import config file
+with open('configs.json') as config_file:
+    configs = json.load(config_file)
 
 # Pygame has trouble rotating images around their center for some reason.
 def blitRotateCenter(surf, image, topleft, angle):
@@ -9,26 +14,27 @@ def blitRotateCenter(surf, image, topleft, angle):
 
     surf.blit(rotated_image, new_rect)
 
-
 class Car:
     # Display Constants
-    color = '#e01616ff'
+    color = configs['display']['car color']
     length = 35
     width = 20
+    show_vectors = configs['debug']['show vectors']
 
-    display_trail = True
+    display_trail = configs['display']['show car trail']
     ticks_per_segment = 1
     trail_segment_decay = 25
     trail_segments = []
 
     # Physics constants
-    top_speed = 10
-    acceleration = 0.3
-    braking_force = 0.4
-    steering_response = 5
-    base_grip = 0.07
-    angle_snap_threshold = 1
-    max_angle_delta = 180
+    top_speed = configs['car']['top speed']
+    acceleration = configs['car']['acceleration']
+    braking_force = configs['car']['braking force']
+    base_deceleration = configs['car']['base deceleration']
+    steering_response = configs['car']['steering response']
+    base_grip = configs['car']['base grip']
+    angle_snap_threshold = configs['car']['angle snap threshold']
+    max_angle_delta = configs['car']['max angle delta']
 
     # Movement variables
     position = pg.Vector2((0,0))
@@ -36,9 +42,10 @@ class Car:
     facing_angle = 0
     velocity_angle = 0
     current_speed = 0
+    applied_velocity = pg.Vector2((0,0))
 
     # Collision variables
-    hitbox = shapely.Polygon(((-width / 2, -length / 2), (width / 2, -length / 2), (width / 2, length / 2), (-width / 2, length / 2)))
+    hitbox_points = ((-width / 2, -length / 2), (width / 2, -length / 2), (width / 2, length / 2), (-width / 2, length / 2))
 
     # Constructor
     def __init__(self, window, pos_x, pos_y, angle = 0):
@@ -69,6 +76,12 @@ class Car:
                     blitRotateCenter(self.window, segment[0],
                     segment[1].topleft, segment[2])
 
+        # Display debug information (if enabled)
+        if self.show_vectors:
+            displayed_velocity = pg.Vector2()
+            displayed_velocity.from_polar((self.current_speed * 5, -self.velocity_angle - 90))
+            pg.draw.line(self.window, '#00ff00', self.position, displayed_velocity + self.position, 2)
+
     # Moves the car based on physics and control input
     def move(self, throttle, steering):
         # Calculate acceleration/braking
@@ -77,7 +90,7 @@ class Car:
         elif throttle < 0:
             applied_acceleration = self.braking_force * throttle
         else:
-            applied_acceleration = 0
+            applied_acceleration = -self.base_deceleration
 
         self.current_speed += applied_acceleration
 
@@ -103,7 +116,14 @@ class Car:
         elif self.current_speed > self.top_speed:
             self.current_speed = self.top_speed
 
-        applied_speed = self.velocity
-        applied_speed = applied_speed.rotate(-self.velocity_angle)
-        applied_speed.scale_to_length(self.current_speed)
-        self.position += applied_speed
+        # Apply velocity to car
+        self.applied_velocity = self.velocity
+        self.applied_velocity = self.applied_velocity.rotate(-self.velocity_angle)
+        self.applied_velocity.scale_to_length(self.current_speed)
+        self.position += self.applied_velocity
+
+        # Update the hitbox position
+        self.hitbox_points = [
+            (i[0] + self.position.x, i[1] + self.position.y)
+            for i in self.hitbox_points
+        ]

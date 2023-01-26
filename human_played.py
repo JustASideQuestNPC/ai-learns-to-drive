@@ -54,14 +54,14 @@ while True:
         steering_input = 0
 
     # Do collision and physics calculations in parallel
-    car.move(throttle_input, steering_input)
-
-    car.is_colliding = track.border_collide(car.hitbox_points)
+    with ThreadPoolExecutor() as executor:
+        collision_thread = executor.submit(track.border_collide, car.hitbox_points)
+        car.move(throttle_input, steering_input)
+        car.is_colliding = collision_thread.result()
 
     # Display everything
     window.fill(configs['display']['background color'])
     track.display()
     car.display(ticks_passed)
     pg.display.flip()
-
     ticks_passed += 1

@@ -2,6 +2,7 @@ import pygame as pg
 from json import load
 from car import *
 from track import Track
+from concurrent.futures import ThreadPoolExecutor
 
 # Import config file
 with open('configs.json') as config_file:
@@ -10,7 +11,6 @@ with open('configs.json') as config_file:
 # Import tracks
 with open('tracks.json') as tracks_file:
     tracks = load(tracks_file)
-
 
 # Create a window
 pg.init()
@@ -53,7 +53,10 @@ while True:
     else:
         steering_input = 0
 
+    # Do collision and physics calculations in parallel
     car.move(throttle_input, steering_input)
+
+    car.is_colliding = track.border_collide(car.hitbox_points)
 
     # Display everything
     window.fill(configs['display']['background color'])

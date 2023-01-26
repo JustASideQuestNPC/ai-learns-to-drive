@@ -1,6 +1,6 @@
 import pygame as pg
-import shapely
 from json import load
+from math import sin, cos, radians
 
 # Import config file
 with open('configs.json') as config_file:
@@ -14,12 +14,24 @@ def blitRotateCenter(surf, image, topleft, angle) -> None:
 
     surf.blit(rotated_image, new_rect)
 
+def rotate_point(point, angle, origin=(0,0)) -> tuple:
+    angle = radians(angle)
+    x = point[0] - origin[0]
+    y = point[1] - origin[1]
+    new_x = (x * cos(angle)) - (y * sin(angle))
+    new_y = (y * cos(angle)) + (x * sin(angle))
+    new_x += origin[0]
+    new_y += origin[1]
+    return (new_x, new_y)
+
 class Car:
     # Display Constants
     color = configs['car']['color']
+    inverted_color = configs['car']['inverted color'] # The 'highlight colliding' debug option changes the colors of objects that are overlapping each other
     length = 35
     width = 20
     show_vectors = configs['debug']['show vectors']
+    show_collision = configs['debug']['highlight colliding']
 
     display_trail = configs['car']['trails']
     ticks_per_segment = 1
@@ -45,7 +57,8 @@ class Car:
     applied_velocity = pg.Vector2((0,0))
 
     # Collision variables
-    hitbox_points = ((-width / 2, -length / 2), (width / 2, -length / 2), (width / 2, length / 2), (-width / 2, length / 2))
+    hitbox_anchors = [(-width / 2, -length / 2), (width / 2, -length / 2), (width / 2, length / 2), (-width / 2, length / 2)]
+    is_colliding = False
 
     # Constructor
     def __init__(self, window, pos_x, pos_y, angle = 0) -> None:
@@ -53,11 +66,19 @@ class Car:
         self.position.update(pos_x, pos_y)
         self.facing_angle = angle
         self.velocity_angle = angle
+        self.hitbox_points = [
+            (i[0] + self.position.x, i[1] + self.position.y)
+            for i in self.hitbox_anchors
+        ]
 
     # Draws the car to the screen
     def display(self, ticks_elapsed) -> None:
+        applied_color = self.color
+        if self.show_collision and self.is_colliding:
+            applied_color = self.inverted_color
+
         sub_surface = pg.Surface((self.width, self.length), pg.SRCALPHA)
-        pg.draw.rect(sub_surface, self.color,
+        pg.draw.rect(sub_surface, applied_color,
                     pg.rect.Rect(0, 0, self.width, self.length))
         sub_rect = sub_surface.get_rect()
         sub_rect.center = (self.position.x, self.position.y)
@@ -124,6 +145,7 @@ class Car:
 
         # Update the hitbox position
         self.hitbox_points = [
-            (i[0] + self.position.x, i[1] + self.position.y)
-            for i in self.hitbox_points
+            rotate_point((i[0] + self.position.x, i[1] + self.position.y),
+            -self.facing_angle, (self.position.x, self.position.y))
+            for i in self.hitbox_anchors
         ]

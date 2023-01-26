@@ -1,6 +1,7 @@
 {
     "debug" : {
-        "show vectors" : true
+        "show vectors" : false,
+        "highlight colliding" : true
     },
 
     "display" : {
@@ -9,6 +10,7 @@
 
     "car" : {
         "color" : "#e01616ff",
+        "inverted color" : "#1fe9e9ff",
         "trails" : false,
         "top speed" : 7,
         "acceleration" : 0.2,
@@ -21,6 +23,7 @@
     },
     
     "track" : {
-        "border color" : "#000000"
+        "border color" : "#000000",
+        "border collision color" : "#a0a0a0"
     }
 }

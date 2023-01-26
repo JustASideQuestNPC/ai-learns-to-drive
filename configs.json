@@ -4,19 +4,23 @@
     },
 
     "display" : {
-        "background color" : "#ffffff",
-        "car color" : "#e01616ff",
-        "show car trail" : false
+        "background color" : "#ffffff"
     },
 
     "car" : {
-        "top speed" : 10,
-        "acceleration" : 0.3,
-        "braking force" : 0.4,
-        "base deceleration" : 0.05,
-        "steering response" : 5,
-        "base grip" : 0.07,
+        "color" : "#e01616ff",
+        "trails" : false,
+        "top speed" : 7,
+        "acceleration" : 0.2,
+        "braking force" : 0.3,
+        "base deceleration" : 0.04,
+        "steering response" : 4,
+        "base grip" : 0.06,
         "angle snap threshold" : 1,
         "max angle delta" : 180
+    },
+    
+    "track" : {
+        "border color" : "#000000"
     }
 }

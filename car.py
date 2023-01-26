@@ -1,13 +1,13 @@
 import pygame as pg
 import shapely
-import json
+from json import load
 
 # Import config file
 with open('configs.json') as config_file:
-    configs = json.load(config_file)
+    configs = load(config_file)
 
 # Pygame has trouble rotating images around their center for some reason.
-def blitRotateCenter(surf, image, topleft, angle):
+def blitRotateCenter(surf, image, topleft, angle) -> None:
 
     rotated_image = pg.transform.rotate(image, angle)
     new_rect = rotated_image.get_rect(center = image.get_rect(topleft = topleft).center)
@@ -16,12 +16,12 @@ def blitRotateCenter(surf, image, topleft, angle):
 
 class Car:
     # Display Constants
-    color = configs['display']['car color']
+    color = configs['car']['color']
     length = 35
     width = 20
     show_vectors = configs['debug']['show vectors']
 
-    display_trail = configs['display']['show car trail']
+    display_trail = configs['car']['trails']
     ticks_per_segment = 1
     trail_segment_decay = 25
     trail_segments = []
@@ -48,14 +48,14 @@ class Car:
     hitbox_points = ((-width / 2, -length / 2), (width / 2, -length / 2), (width / 2, length / 2), (-width / 2, length / 2))
 
     # Constructor
-    def __init__(self, window, pos_x, pos_y, angle = 0):
+    def __init__(self, window, pos_x, pos_y, angle = 0) -> None:
         self.window = window
         self.position.update(pos_x, pos_y)
         self.facing_angle = angle
         self.velocity_angle = angle
 
     # Draws the car to the screen
-    def display(self, ticks_elapsed):
+    def display(self, ticks_elapsed) -> None:
         sub_surface = pg.Surface((self.width, self.length), pg.SRCALPHA)
         pg.draw.rect(sub_surface, self.color,
                     pg.rect.Rect(0, 0, self.width, self.length))
@@ -83,7 +83,7 @@ class Car:
             pg.draw.line(self.window, '#00ff00', self.position, displayed_velocity + self.position, 2)
 
     # Moves the car based on physics and control input
-    def move(self, throttle, steering):
+    def move(self, throttle, steering) -> None:
         # Calculate acceleration/braking
         if throttle > 0:
             applied_acceleration = self.acceleration * throttle

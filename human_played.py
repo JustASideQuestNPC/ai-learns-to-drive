@@ -1,10 +1,16 @@
 import pygame as pg
+from json import load
 from car import *
-import json
+from track import Track
 
 # Import config file
 with open('configs.json') as config_file:
-    configs = json.load(config_file)
+    configs = load(config_file)
+
+# Import tracks
+with open('tracks.json') as tracks_file:
+    tracks = load(tracks_file)
+
 
 # Create a window
 pg.init()
@@ -15,8 +21,11 @@ pg.display.init()
 clock = pg.time.Clock()
 ticks_passed = 0
 
-# Player Car
-car = Car(window, 540, 360, 30)
+# Player car
+car = Car(window, 540, 360)
+
+# Current track
+track = Track(window, tracks[0])
 
 while True:
     clock.tick(60)
@@ -48,6 +57,7 @@ while True:
 
     # Display everything
     window.fill(configs['display']['background color'])
+    track.display()
     car.display(ticks_passed)
     pg.display.flip()
 

@@ -4,7 +4,7 @@ import json
 def multi_line_text(window, font, font_size, lines, start_coords = (5, 5)) -> None:
     for i, line in enumerate(lines):
         sub_surf = font.render(line, True, '#000000')
-        window.blit(sub_surf, (start_coords[0], start_coords[1] + i * 20))
+        window.blit(sub_surf, (start_coords[0], start_coords[1] + i * 18))
 
 # Create a window
 pg.init()
@@ -12,21 +12,24 @@ window = pg.display.set_mode((1080, 720))
 pg.display.init()
 
 # Used for displaying builder states and other info onscreen
-display_font = pg.font.SysFont('monospace', 16)
+display_font = pg.font.SysFont('monospace', 14)
 display_text = 'waiting...'
 
 # Limits framerates to a reasonable value
 clock = pg.time.Clock()
 
-# Single points for track borders, used for display and building
+# Track data
 border_points = []
 finished_border_points = []
+start_point = ()
+current_checkpoint = []
+all_checkpoints = []
 
 # Possible states:
 #   0: Placing 1st border
 #   1: Placing 2nd border
-#   3: Placing checkpoints
-#   4: Placing start point
+#   3: Placing start point
+#   4: Placing checkpoints
 builder_state = 0
 while True:
     clock.tick(60)
@@ -49,6 +52,21 @@ while True:
                 # ...and remove one if the right button is pressed
                 elif event.button == 3 and len(border_points) > 0:
                     border_points.pop(-1)
+            # When placing the start point, place the start point and go to the next stage (checkpoints)
+            elif builder_state == 2:
+                start_point = mouse_pos
+                builder_state += 1
+            # When placing checkpoints:
+            elif builder_state == 3:
+                # Add checkpoints if the left button is pressed...
+                if event.button == 1:
+                    current_checkpoint.append(mouse_pos)
+                    if len(current_checkpoint) >= 2:
+                        all_checkpoints.append(current_checkpoint)
+                        current_checkpoint = []
+                # ...and remove them if the right button is pressed
+                elif event.button == 3 and len(all_checkpoints) > 0:
+                    all_checkpoints.pop(-1)
 
         elif event.type == pg.KEYDOWN:
             if event.key == pg.K_RETURN:
@@ -59,7 +77,9 @@ while True:
                 elif builder_state == 1 and len(border_points) >= 3:
                     builder_state += 1
                 elif builder_state == 2:
-                    pass # Do nothing, state 2 is placing the start point and advances on click
+                    pass # Do nothing, state 2 is placing the start point and only advances on click
+                elif builder_state == 3 and len(all_checkpoints) >= 3:
+                    pass
 
     # Display everything
     window.fill('#ffffff')
@@ -67,18 +87,33 @@ while True:
     # Handles some edge cases at the beginning of the process
     if builder_state == 0 or builder_state == 1:
         if len(border_points) == 0:
-            pg.draw.line(window, '#000000', mouse_pos, mouse_pos, 2)
+            pg.draw.line(window, '#000000', mouse_pos, mouse_pos, 4)
         elif len(border_points) == 1:
-            pg.draw.line(window, '#000000', border_points[0], mouse_pos, 2)
+            pg.draw.line(window, '#000000', border_points[0], mouse_pos, 4)
         else:
             displayed_border = border_points + [mouse_pos]
-            pg.draw.lines(window, '#000000', True, displayed_border, 2)
+            pg.draw.lines(window, '#000000', True, displayed_border, 4)
     else:
-        pg.draw.lines(window, '#a0a0a0', True, border_points, 2)
+        pg.draw.lines(window, '#a0a0a0', True, border_points, 4)
     
+    # Draws finished borders in grey
     if len(finished_border_points) > 0:
-        pg.draw.lines(window, '#a0a0a0', True, finished_border_points, 2)
+        pg.draw.lines(window, '#a0a0a0', True, finished_border_points, 4)
 
+    if builder_state == 2:
+        pg.draw.circle(window, '#00ff00', mouse_pos, 5)
+    elif builder_state > 2:
+        pg.draw.circle(window, '#50ff50', start_point, 5)
+
+    if builder_state == 3:
+        if len(current_checkpoint) == 0:
+            pg.draw.line(window, '#ff0000', mouse_pos, mouse_pos, 2)
+        elif len(current_checkpoint) == 1:
+            pg.draw.line(window, '#ff0000', current_checkpoint[0], mouse_pos, 2)
+        for cp in all_checkpoints:
+            pg.draw.line(window, '#ff5050', cp[0], cp[1], 2)
+
+    # Display some info text in the corner of the screen
     if builder_state == 0:
         display_text = ['Placing first border...DO NOT let borders intersect!',
                         'Left click to place a point, right click to remove points.',
@@ -90,6 +125,10 @@ while True:
     elif builder_state == 2:
         display_text = ['Placing start point...make sure it\'s inside the track!',
                         'Left click to place the starting point and move on to the next step.']
+    elif builder_state == 3:
+        display_text = ['Placing checkpoints...more is always better!',
+                        'Left click to place checkpoints, and right click to remove your last checkpoint.',
+                        'Press enter to finish and save your track.']
 
     multi_line_text(window, display_font, 16, display_text)
     pg.display.flip()

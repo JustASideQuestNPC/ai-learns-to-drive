@@ -18,12 +18,13 @@ display_text = 'waiting...'
 # Limits framerates to a reasonable value
 clock = pg.time.Clock()
 
-# Track data
+# Builder data
 border_points = []
 finished_border_points = []
 start_point = ()
 current_checkpoint = []
 all_checkpoints = []
+border_data = []
 
 # Possible states:
 #   0: Placing 1st border
@@ -72,14 +73,31 @@ while True:
             if event.key == pg.K_RETURN:
                 if builder_state == 0 and len(border_points) >= 3:
                     finished_border_points = border_points
+                    border_data = [(border_points[i-1], border_points[i]) for i in range(len(border_points))]
                     border_points = []
                     builder_state += 1
                 elif builder_state == 1 and len(border_points) >= 3:
+                    appended_data = [(border_points[i-1], border_points[i]) for i in range(len(border_points))]
+                    border_data += appended_data
                     builder_state += 1
                 elif builder_state == 2:
                     pass # Do nothing, state 2 is placing the start point and only advances on click
                 elif builder_state == 3 and len(all_checkpoints) >= 3:
-                    pass
+                    # Construct the dictionary for the track
+                    track_data = {}
+                    track_data['borders'] = border_data
+                    track_data['start point'] = start_point
+                    track_data['checkpoints'] = all_checkpoints
+                    # Get existing data from the tracks file
+                    with open('tracks.json', 'r') as tracks_file:
+                        existing_data = json.load(tracks_file)
+                    existing_data.append(track_data)
+                    
+                    # Write new data to the tracks file
+                    with open('tracks.json', 'w') as tracks_file:
+                        json.dump(existing_data, tracks_file, indent=2)
+                    pg.quit()
+                    quit()
 
     # Display everything
     window.fill('#ffffff')

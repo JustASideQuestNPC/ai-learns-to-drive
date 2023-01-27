@@ -28,8 +28,8 @@ class Car:
     # Display Constants
     color = configs['car']['color']
     inverted_color = configs['car']['inverted color'] # The 'highlight colliding' debug option changes the colors of objects that are overlapping each other
-    length = 35
-    width = 20
+    length = 20
+    width = 12
     show_vectors = configs['debug']['show vectors']
     show_collision = configs['debug']['highlight colliding']
 

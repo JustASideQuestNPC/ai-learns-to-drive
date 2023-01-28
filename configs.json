@@ -3,7 +3,7 @@
         "show vectors" : false,
         "highlight colliding" : true,
         "show checkpoints" : true,
-        "show starting point" : true
+        "show start point" : true
     },
 
     "display" : {
@@ -27,8 +27,8 @@
     "track" : {
         "border color" : "#000000",
         "border collision color" : "#a0a0a0",
-        "checkpoint color" : "#ff50505",
-        "checkpoint collision color" : "#00afaf",
-        "start point color" : "#00ff00"
+        "checkpoint color" : "#ff5050",
+        "checkpoint collision color" : "#50ffff",
+        "start point color" : "#50ff50"
     }
 }

@@ -55,9 +55,9 @@ while True:
 
     # Do collision and physics calculations in parallel
     with ThreadPoolExecutor() as executor:
-        collision_thread = executor.submit(track.border_collide, car.hitbox_points)
+        collision_thread = executor.submit(track.do_collisions, car.hitbox_points)
         car.move(throttle_input, steering_input)
-        car.is_colliding = collision_thread.result()
+        car.is_colliding, _ = collision_thread.result()
 
     # Display everything
     window.fill(configs['display']['background color'])

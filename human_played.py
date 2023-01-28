@@ -21,11 +21,15 @@ pg.display.init()
 clock = pg.time.Clock()
 ticks_passed = 0
 
-# Player car
-car = Car(window, 540, 360)
-
 # Current track
 track = Track(window, tracks[0])
+
+# Player car
+car = Car(window, track.start_point, 90)
+
+# Used to only count checkpoints once per lap
+passed_checkpoints = [False for i in track.checkpoints]
+num_checkpoints_passed = 0
 
 while True:
     clock.tick(60)
@@ -57,7 +61,14 @@ while True:
     with ThreadPoolExecutor() as executor:
         collision_thread = executor.submit(track.do_collisions, car.hitbox_points)
         car.move(throttle_input, steering_input)
-        car.is_colliding, _ = collision_thread.result()
+        car.is_colliding, passed_cp = collision_thread.result()
+        if passed_cp != -1 and not passed_checkpoints[passed_cp]:
+            num_checkpoints_passed += 1
+            passed_checkpoints[passed_cp] = True
+            if num_checkpoints_passed == len(passed_checkpoints):
+                num_checkpoints_passed = 0
+                passed_checkpoints = [False for i in passed_checkpoints]
+
 
     # Display everything
     window.fill(configs['display']['background color'])

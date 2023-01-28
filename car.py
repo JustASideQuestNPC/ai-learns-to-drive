@@ -61,9 +61,9 @@ class Car:
     is_colliding = False
 
     # Constructor
-    def __init__(self, window, pos_x, pos_y, angle = 0) -> None:
+    def __init__(self, window, pos, angle = 0) -> None:
         self.window = window
-        self.position.update(pos_x, pos_y)
+        self.position.update(pos)
         self.facing_angle = angle
         self.velocity_angle = angle
         self.hitbox_points = [

@@ -51,12 +51,12 @@ class Track:
 
     def checkpoint_collide(self, hitbox):
         hitbox_poly = shapely.Polygon(hitbox)
-        collision = False
+        collision = -1
         for i, checkpoint in enumerate(self.checkpoint_colliders):
             self.checkpoints_colliding[i] = False
             if hitbox_poly.intersects(checkpoint):
                 self.checkpoints_colliding[i] = True
-                collision = True
+                collision = i
         return collision
 
     # Draws the track to the screen
@@ -73,3 +73,6 @@ class Track:
                 if self.highlight_colliding and self.checkpoints_colliding[i]:
                     applied_color = self.checkpoint_collision_color
                 pg.draw.line(self.window, applied_color, checkpoint[0], checkpoint[1], 2)
+
+        if self.show_start_point:
+            pg.draw.circle(self.window, self.start_point_color, self.start_point, 5)

@@ -3,7 +3,8 @@
         "show vectors" : false,
         "highlight colliding" : true,
         "show checkpoints" : true,
-        "show start point" : true
+        "show start point" : true,
+        "show raycasts" : true
     },
 
     "display" : {
@@ -30,5 +31,10 @@
         "checkpoint color" : "#ff5050",
         "checkpoint collision color" : "#50ffff",
         "start point color" : "#50ff50"
+    },
+
+    "training" : {
+        "ray angles" : [-90, -45, 0, 45, 90],
+        "ray length" : 1000
     }
 }

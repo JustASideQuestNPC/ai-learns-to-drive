@@ -49,11 +49,8 @@ class Car:
     max_angle_delta = configs['car']['max angle delta']
 
     # Movement variables
-    position = pg.Vector2((0,0))
-    velocity = pg.Vector2((0,-1))
     facing_angle = 0
     velocity_angle = 0
-    current_speed = 0
     applied_velocity = pg.Vector2((0,0))
 
     # Collision variables
@@ -63,7 +60,9 @@ class Car:
     # Constructor
     def __init__(self, window, pos, angle = 0) -> None:
         self.window = window
-        self.position.update(pos)
+        self.position = pg.Vector2(pos)
+        self.velocity = pg.Vector2((0,-1))
+        self.current_speed = 0
         self.facing_angle = angle
         self.velocity_angle = angle
         self.hitbox_points = [

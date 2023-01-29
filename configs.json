@@ -1,10 +1,10 @@
 {
     "debug" : {
         "show vectors" : false,
-        "highlight colliding" : true,
+        "highlight colliding" : false,
         "show checkpoints" : true,
-        "show start point" : true,
-        "show raycasts" : true
+        "show start point" : false,
+        "show raycasts" : false
     },
 
     "display" : {

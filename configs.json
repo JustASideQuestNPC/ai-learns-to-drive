@@ -18,9 +18,9 @@
         "top speed" : 7,
         "acceleration" : 0.2,
         "braking force" : 0.3,
-        "base deceleration" : 0.04,
+        "base deceleration" : 0.025,
         "steering response" : 4,
-        "base grip" : 0.06,
+        "base grip" : 0.1,
         "angle snap threshold" : 1,
         "max angle delta" : 180
     },
@@ -41,7 +41,7 @@
         "survival bonus" : 0,
         "death penalty" : -5,
         "checkpoint bonus" : 10,
-        "checkpoint speed multiplier" : 1,
+        "checkpoint speed multiplier" : 1.2,
         "max generation length" : 600
     }
 }

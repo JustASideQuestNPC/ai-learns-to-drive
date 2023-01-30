@@ -7,6 +7,7 @@ from concurrent.futures import ThreadPoolExecutor
 from math import sin, cos, radians
 import neat
 from os import path
+from random import choice
 
 population_size = 5
 
@@ -70,7 +71,7 @@ clock = pg.time.Clock()
 # The "fitness function" for the AI, which has them play the simulation and assigns fitness values based on how well they performed
 def fitness(genomes, config):
     # Current track
-    track = Track(window, tracks[0])
+    track = Track(window, choice(tracks))
 
     # Create the neural networks in the current population
     nets = []
@@ -137,9 +138,9 @@ def fitness(genomes, config):
             collision_results = collision_thread.result()
 
             for i, res in enumerate(collision_results):
-                is_colliding, passed_cp = res
+                colliding, passed_cp = res
 
-                if passed_cp != -1 and not passed_checkpoints[i][passed_cp]:
+                if passed_cp != -1 and not passed_checkpoints[i][passed_cp] and not colliding:
                     speed_multiplier = map_ranges(cars[i].current_speed, 0, configs['car']['top speed'],
                                         1, configs['training']['checkpoint speed multiplier'])
                     ge[i].fitness += configs['training']['checkpoint bonus'] * speed_multiplier
@@ -148,10 +149,10 @@ def fitness(genomes, config):
                     passed_checkpoints[i][passed_cp] = True
                     if num_checkpoints_passed[i] == len(passed_checkpoints[i]):
                         num_checkpoints_passed[i] = 0
-                        passed_checkpoints[i] = [False for i in passed_checkpoints]
+                        passed_checkpoints[i] = [False for i in track.checkpoints]
                 
                 # Destroy cars if they hit a wall
-                if is_colliding:
+                if colliding:
                     ge[i].fitness += configs['training']['death penalty']
                     cars.pop(i)
                     nets.pop(i)

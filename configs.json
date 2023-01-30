@@ -35,6 +35,13 @@
 
     "training" : {
         "ray angles" : [-90, -45, 0, 45, 90],
-        "ray length" : 1000
+        "ray length" : 1000,
+        "allow braking" : false,
+        "allow partial inputs" : false,
+        "survival bonus" : 0,
+        "death penalty" : -5,
+        "checkpoint bonus" : 10,
+        "checkpoint speed multiplier" : 1,
+        "max generation length" : 600
     }
 }

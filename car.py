@@ -62,7 +62,7 @@ class Car:
         self.window = window
         self.position = pg.Vector2(pos)
         self.velocity = pg.Vector2((0,-1))
-        self.current_speed = 0
+        self.current_speed = 3.5
         self.facing_angle = angle
         self.velocity_angle = angle
         self.hitbox_points = [

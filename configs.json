@@ -1,10 +1,11 @@
 {
   "debug": {
-    "show vectors": true,
+    "show vectors": false,
     "highlight colliding": false,
     "show checkpoints": false,
     "show start point": true,
-    "show raycasts": false
+    "show raycasts": false,
+    "start paused": true
   },
   "display": {
     "background color": "#ffffff"
@@ -18,7 +19,7 @@
     "braking force": 0.3,
     "base deceleration": 0.025,
     "steering response": 4,
-    "base grip": 0.15,
+    "base grip": 0.1,
     "angle snap threshold": 1,
     "max angle delta": 180
   },
@@ -40,8 +41,8 @@
     "ray length": 1000,
     "allow braking": false,
     "allow partial inputs": false,
-    "survival bonus": "0",
-    "death penalty": "-5",
+    "survival bonus": 0,
+    "death penalty": -5,
     "checkpoint bonus": 10,
     "checkpoint speed multiplier": 1,
     "max generation length": 600,

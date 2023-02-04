@@ -50,8 +50,8 @@ car_tab = [
 training_tab = [
         [sg.Text('Allow AI to brake:'), sg.Button(config_displays[5], key='-ALLOW_BRAKING-')],
         [sg.Text('Allow partial inputs:'), sg.Button(config_displays[6], key='-ALLOW_PARTIAL_INPUTS-')],
-        [sg.Text('Passive survival bonus:'), sg.Spin([i for i in range(-50, -50)], initial_value=configs['training']['survival bonus'], key='-SURVIVAL_BONUS-', size=5)],
-        [sg.Text('Death penalty'), sg.Spin([i for i in range(-50, -50)], initial_value=configs['training']['death penalty'], key='-DEATH_PENALTY-', size=5)],
+        [sg.Text('Passive survival bonus:'), sg.Spin([i for i in range(-50, 50)], initial_value=configs['training']['survival bonus'], key='-SURVIVAL_BONUS-', size=5)],
+        [sg.Text('Death penalty'), sg.Spin([i for i in range(-50, 50)], initial_value=configs['training']['death penalty'], key='-DEATH_PENALTY-', size=5)],
         [sg.Text('Checkpoint bonus:'), sg.Spin([i for i in range(-50, 50)], initial_value=configs['training']['checkpoint bonus'], key='-CHECKPOINT_BONUS-', size=5)],
         [sg.Text('Checkpoint speed multiplier:'), sg.Spin([i for i in range(0, 10)], initial_value=configs['training']['checkpoint speed multiplier'], key='-CHECKPOINT_SPEED_MULTIPLIER-', size=5)],
 ]
@@ -89,31 +89,7 @@ while True:
     elif event == '-ALLOW_PARTIAL_INPUTS-':
         configs['training']['allow partial inputs'] = toggle(configs['training']['allow partial inputs'])
         window['-ALLOW_PARTIAL_INPUTS-'].update('Yes' if configs['training']['allow partial inputs'] else 'No')
-    """
-    elif event == '-TOP_SPEED-':
-        configs['car']['top speed'] = values[0]
-    elif event == '-ACCELERATION-':
-        configs['car']['acceleration'] = values[0]
-    elif event == '-BRAKING_FORCE-':
-        configs['car']['braking force'] = values[0]
-    elif event == '-STEERING_RESPONSE-':
-        configs['car']['steering response'] = values[0]
-    elif event == '-GROUND_FRICTION-':
-        configs['car']['base deceleration'] = values[0]
-    elif event == '-GRIP_PERCENTAGE-':
-        configs['car']['grip percentage'] = values[0] / 100
-    elif event == '-SIMULATION_SPEED-':
-        configs['training']['simulation speed'] = values[0]
-    elif event == '-SURVIVAL_BONUS-':
-        configs['training']['survival bonus'] = values[0]
-    elif event == '-DEATH_PENALTY-':
-        configs['training']['death penalty'] = values[0]
-    elif event == '-CHECKPOINT_BONUS-':
-        configs['training']['checkpoint bonus'] = values[0]
-    elif event == '-CHECKPOINT_SPEED_MULTIPLIER-':
-        configs['training']['checkpoint speed multiplier'] = values[0]
-    """
-    if event == 'Save':
+    elif event == 'Save':
         configs['car']['top speed'] = window['-TOP_SPEED-'].Get()
         configs['car']['acceleration'] = window['-ACCELERATION-'].Get()
         configs['car']['braking force'] = window['-BRAKING_FORCE-'].Get()

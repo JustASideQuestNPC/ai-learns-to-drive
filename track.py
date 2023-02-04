@@ -19,11 +19,6 @@ class Track:
     border_colliders = []
     border_segments_colliding = []
 
-    # Debug constants
-    highlight_colliding = configs['debug']['highlight colliding']
-    show_checkpoints = configs['debug']['show checkpoints']
-    show_start_point = configs['debug']['show start point']
-
     # Constructor
     def __init__(self, window, track_data) -> None:
         self.window = window
@@ -60,19 +55,19 @@ class Track:
         return collision
 
     # Draws the track to the screen
-    def display(self) -> None:
+    def display(self, highlight_colliding, show_checkpoints, show_start_point) -> None:
         for i, segment in enumerate(self.borders):
             applied_color = self.border_color
-            if self.highlight_colliding and self.border_segments_colliding[i]:
+            if highlight_colliding and self.border_segments_colliding[i]:
                 applied_color = self.border_collision_color
             pg.draw.line(self.window, applied_color, segment[0], segment[1], 2)
 
-        if self.show_checkpoints:
+        if show_checkpoints:
             for i, checkpoint in enumerate(self.checkpoints):
                 applied_color = self.checkpoint_color
-                if self.highlight_colliding and self.checkpoints_colliding[i]:
+                if highlight_colliding and self.checkpoints_colliding[i]:
                     applied_color = self.checkpoint_collision_color
                 pg.draw.line(self.window, applied_color, checkpoint[0], checkpoint[1], 2)
 
-        if self.show_start_point:
+        if show_start_point:
             pg.draw.circle(self.window, self.start_point_color, self.start_point, 5)

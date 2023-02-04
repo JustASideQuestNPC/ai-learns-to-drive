@@ -30,8 +30,6 @@ class Car:
     inverted_color = configs['car']['inverted color'] # The 'highlight colliding' debug option changes the colors of objects that are overlapping each other
     length = 20
     width = 12
-    show_vectors = configs['debug']['show vectors']
-    show_collision = configs['debug']['highlight colliding']
 
     display_trail = configs['car']['trails']
     ticks_per_segment = 1
@@ -71,9 +69,9 @@ class Car:
         ]
 
     # Draws the car to the screen
-    def display(self, ticks_elapsed) -> None:
+    def display(self, ticks_elapsed, show_vectors, show_colliding) -> None:
         applied_color = self.color
-        if self.show_collision and self.is_colliding:
+        if show_colliding and self.is_colliding:
             applied_color = self.inverted_color
 
         sub_surface = pg.Surface((self.width, self.length), pg.SRCALPHA)
@@ -97,9 +95,9 @@ class Car:
                     segment[1].topleft, segment[2])
 
         # Display debug information (if enabled)
-        if self.show_vectors:
+        if show_vectors:
             displayed_velocity = pg.Vector2()
-            displayed_velocity.from_polar((self.current_speed * 5, -self.velocity_angle - 90))
+            displayed_velocity.from_polar((self.current_speed * 10, -self.velocity_angle - 90))
             pg.draw.line(self.window, '#00ff00', self.position, displayed_velocity + self.position, 2)
 
     # Moves the car based on physics and control input

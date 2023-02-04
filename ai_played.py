@@ -11,11 +11,11 @@ from random import choice
 
 population_size = 5
 
-# Import config file
+# Load configs
 with open('configs.json') as config_file:
     configs = load(config_file)
 
-# Import tracks
+# Load tracks
 with open('tracks.json') as tracks_file:
     tracks = load(tracks_file)
 
@@ -65,11 +65,21 @@ pg.init()
 window = pg.display.set_mode((1080, 720))
 pg.display.init()
 
+font = pg.font.SysFont('monospace', 24)
+
 # Limits framerate/simulation speed to reasonable values
 clock = pg.time.Clock()
 
+generation = 1
+simulation_paused = configs['debug']['start paused']
+
 # The "fitness function" for the AI, which has them play the simulation and assigns fitness values based on how well they performed
 def fitness(genomes, config):
+    global generation
+    global simulation_paused
+    global configs
+    max_generation_length = configs['training']['max generation length']
+
     # Current track
     track = Track(window, choice(tracks))
 
@@ -95,9 +105,7 @@ def fitness(genomes, config):
 
     running = True
     while running:
-        clock.tick(120)
-
-        keys = pg.key.get_pressed()
+        clock.tick(configs['training']['simulation speed'])
 
         for event in pg.event.get():
             # Close the window when the X is clicked
@@ -105,9 +113,18 @@ def fitness(genomes, config):
                 running = False
                 pg.quit()
                 quit()
+            elif event.type == pg.KEYDOWN:
+                if event.key == pg.K_SPACE:
+                    simulation_paused = False if simulation_paused else True
+                elif event.key == pg.K_s:
+                    configs['debug']['show start point'] = False if configs['debug']['show start point'] else True
+                elif event.key == pg.K_c:
+                    configs['debug']['show checkpoints'] = False if configs['debug']['show checkpoints'] else True
+                elif event.key == pg.K_v:
+                    configs['debug']['show vectors'] = False if configs['debug']['show vectors'] else True
 
         # Stops training if all AIs are dead
-        if len(cars) == 0 or ticks_passed > configs['training']['max generation length']:
+        if len(cars) == 0 or ticks_passed > max_generation_length:
             cars = []
             nets = []
             ge = []
@@ -118,58 +135,61 @@ def fitness(genomes, config):
             collision_results = []
             break
         
-        ray_distances = []
-        for i, rc in enumerate(raycasters):
-            rc.position = cars[i].position
-            rc.angle = -cars[i].facing_angle - 90
-            ray_distances.append(rc.cast(track.border_colliders))
+        # Do physics and AI calculations if the simulation isn't paused
+        if not simulation_paused:
+            ray_distances = []
+            for i, rc in enumerate(raycasters):
+                rc.position = cars[i].position
+                rc.angle = -cars[i].facing_angle - 90
+                ray_distances.append(rc.cast(track.border_colliders))
 
-        # Do collision and physics calculations in parallel
-        with ThreadPoolExecutor() as executor:
-            collision_thread = executor.submit(do_all_collisions, track, cars)
+            # Do collision and physics calculations in parallel
+            with ThreadPoolExecutor() as executor:
+                collision_thread = executor.submit(do_all_collisions, track, cars)
 
-            for i, car in enumerate(cars):
-                # Get control input each AI, then move its car
-                throttle_input, steering_input = nets[i].activate(ray_distances[i] + [car.current_speed])
+                for i, car in enumerate(cars):
+                    # Get control input each AI, then move its car
+                    throttle_input, steering_input = nets[i].activate(ray_distances[i] + [car.current_speed])
 
-                car.move(throttle_input, steering_input)
+                    car.move(throttle_input, steering_input)
 
-            collision_results = []
-            collision_results = collision_thread.result()
+                collision_results = []
+                collision_results = collision_thread.result()
 
-            for i, res in enumerate(collision_results):
-                colliding, passed_cp = res
+                for i, res in enumerate(collision_results):
+                    colliding, passed_cp = res
 
-                if passed_cp != -1 and not passed_checkpoints[i][passed_cp] and not colliding:
-                    speed_multiplier = map_ranges(cars[i].current_speed, 0, configs['car']['top speed'],
-                                        1, configs['training']['checkpoint speed multiplier'])
-                    ge[i].fitness += configs['training']['checkpoint bonus'] * speed_multiplier
+                    if passed_cp != -1 and not passed_checkpoints[i][passed_cp] and not colliding:
+                        speed_multiplier = map_ranges(cars[i].current_speed, 0, configs['car']['top speed'],
+                                            1, configs['training']['checkpoint speed multiplier'])
+                        ge[i].fitness += configs['training']['checkpoint bonus'] * speed_multiplier
 
-                    num_checkpoints_passed[i] += 1
-                    passed_checkpoints[i][passed_cp] = True
-                    if num_checkpoints_passed[i] == len(passed_checkpoints[i]):
-                        num_checkpoints_passed[i] = 0
-                        passed_checkpoints[i] = [False for i in track.checkpoints]
-                
-                # Destroy cars if they hit a wall
-                if colliding:
-                    ge[i].fitness += configs['training']['death penalty']
-                    cars.pop(i)
-                    nets.pop(i)
-                    ge.pop(i)
-                    passed_checkpoints.pop(i)
-                    num_checkpoints_passed.pop(i)
-                    raycasters.pop(i)
-                    ray_distances.pop(i)
-                    collision_results.pop(i)
-                else:
-                    ge[i].fitness += configs['training']['survival bonus']
+                        num_checkpoints_passed[i] += 1
+                        passed_checkpoints[i][passed_cp] = True
+                        if num_checkpoints_passed[i] == len(passed_checkpoints[i]):
+                            num_checkpoints_passed[i] = 0
+                            passed_checkpoints[i] = [False for i in track.checkpoints]
+                    
+                    # Destroy cars if they hit a wall
+                    if colliding:
+                        ge[i].fitness += configs['training']['death penalty']
+                        cars.pop(i)
+                        nets.pop(i)
+                        ge.pop(i)
+                        passed_checkpoints.pop(i)
+                        num_checkpoints_passed.pop(i)
+                        raycasters.pop(i)
+                        ray_distances.pop(i)
+                        collision_results.pop(i)
+                    else:
+                        ge[i].fitness += configs['training']['survival bonus']
+
 
         # Display everything
         window.fill(configs['display']['background color'])
-        track.display()
+        track.display(configs['debug']['highlight colliding'], configs['debug']['show checkpoints'], configs['debug']['show start point'])
         for car in cars:
-            car.display(ticks_passed)
+            car.display(ticks_passed, configs['debug']['show vectors'], configs['debug']['highlight colliding'])
 
         if configs['debug']['show raycasts']:
             for i, ray in enumerate(ray_distances):
@@ -182,8 +202,22 @@ def fitness(genomes, config):
                     pg.draw.line(window, '#00ff00', cars[i].position, ray_endpoint, 2)
                     pg.draw.circle(window, '#707070', ray_endpoint, 5)
 
+        # Display some info on the current generation
+        if not simulation_paused:
+            info_text = f'Running generation {generation} | {max_generation_length - ticks_passed} ticks until next generation.'
+        else:
+            info_text = 'Simulation paused.'
+
+        sub_surf = pg.font.Font.render(font, info_text, True, '#ff0000')
+        window.blit(sub_surf, (7, 7))
+
         pg.display.flip()
-        ticks_passed += 1
+
+        # Only advance the tick counter if the simulation isn't paused
+        if not simulation_paused:
+            ticks_passed += 1
+
+    generation += 1
 
 # Runs the entire program
 def run(config_path):

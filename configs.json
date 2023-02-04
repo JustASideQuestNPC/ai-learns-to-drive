@@ -1,47 +1,50 @@
 {
-    "debug" : {
-        "show vectors" : false,
-        "highlight colliding" : false,
-        "show checkpoints" : true,
-        "show start point" : false,
-        "show raycasts" : false
-    },
-
-    "display" : {
-        "background color" : "#ffffff"
-    },
-
-    "car" : {
-        "color" : "#e01616ff",
-        "inverted color" : "#1fe9e9ff",
-        "trails" : false,
-        "top speed" : 7,
-        "acceleration" : 0.2,
-        "braking force" : 0.3,
-        "base deceleration" : 0.025,
-        "steering response" : 4,
-        "base grip" : 0.1,
-        "angle snap threshold" : 1,
-        "max angle delta" : 180
-    },
-    
-    "track" : {
-        "border color" : "#000000",
-        "border collision color" : "#a0a0a0",
-        "checkpoint color" : "#ff5050",
-        "checkpoint collision color" : "#50ffff",
-        "start point color" : "#50ff50"
-    },
-
-    "training" : {
-        "ray angles" : [-90, -45, 0, 45, 90],
-        "ray length" : 1000,
-        "allow braking" : false,
-        "allow partial inputs" : false,
-        "survival bonus" : 0,
-        "death penalty" : -5,
-        "checkpoint bonus" : 10,
-        "checkpoint speed multiplier" : 1.2,
-        "max generation length" : 600
-    }
+  "debug": {
+    "show vectors": true,
+    "highlight colliding": false,
+    "show checkpoints": false,
+    "show start point": true,
+    "show raycasts": false
+  },
+  "display": {
+    "background color": "#ffffff"
+  },
+  "car": {
+    "color": "#e01616ff",
+    "inverted color": "#1fe9e9ff",
+    "trails": false,
+    "top speed": 7,
+    "acceleration": 0.2,
+    "braking force": 0.3,
+    "base deceleration": 0.025,
+    "steering response": 4,
+    "base grip": 0.15,
+    "angle snap threshold": 1,
+    "max angle delta": 180
+  },
+  "track": {
+    "border color": "#000000",
+    "border collision color": "#a0a0a0",
+    "checkpoint color": "#ff5050",
+    "checkpoint collision color": "#50ffff",
+    "start point color": "#50ff50"
+  },
+  "training": {
+    "ray angles": [
+      -90,
+      -45,
+      0,
+      45,
+      90
+    ],
+    "ray length": 1000,
+    "allow braking": false,
+    "allow partial inputs": false,
+    "survival bonus": "0",
+    "death penalty": "-5",
+    "checkpoint bonus": 10,
+    "checkpoint speed multiplier": 1,
+    "max generation length": 600,
+    "simulation speed": 60
+  }
 }

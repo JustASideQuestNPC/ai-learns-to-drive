@@ -35,7 +35,8 @@ debug_tab = [
         [sg.Text('Highlight collisions:'), sg.Button(config_displays[1], key='-HIGHLIGHT_COLLISIONS-')],
         [sg.Text('Show checkpoints:'), sg.Button(config_displays[2], key='-SHOW_CHECKPOINTS-')],
         [sg.Text('Show starting point:'), sg.Button(config_displays[3], key='-SHOW_START_POINT-')],
-        [sg.Text('Show raycasts:'), sg.Button(config_displays[4], key='-SHOW_RAYCASTS-')]]
+        [sg.Text('Show raycasts:'), sg.Button(config_displays[4], key='-SHOW_RAYCASTS-')],
+        [sg.Text('Start with simulation paused:'), sg.Button(config_displays[4], key='-START_PAUSED-')]]
 
 car_tab = [
         [sg.Text('Top speed:'), sg.Spin([i for i in range(1, 100)], initial_value=configs['car']['top speed'], key='-TOP_SPEED-', size=5)],
@@ -89,6 +90,9 @@ while True:
     elif event == '-ALLOW_PARTIAL_INPUTS-':
         configs['training']['allow partial inputs'] = toggle(configs['training']['allow partial inputs'])
         window['-ALLOW_PARTIAL_INPUTS-'].update('Yes' if configs['training']['allow partial inputs'] else 'No')
+    elif event == '-START_PAUSED-':
+        configs['debug']['start paused'] = toggle(configs['debug']['start paused'])
+        window['-START_PAUSED-'].update('Yes' if configs['debug']['start paused'] else 'No')
     elif event == 'Save':
         configs['car']['top speed'] = window['-TOP_SPEED-'].Get()
         configs['car']['acceleration'] = window['-ACCELERATION-'].Get()

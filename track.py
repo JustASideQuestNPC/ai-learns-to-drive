@@ -3,7 +3,7 @@ import pymunk
 import shapely
 from json import load
 
-with open('configs.json') as config_file:
+with open('configs.json', 'r') as config_file:
     configs = load(config_file)
 
 class Track:

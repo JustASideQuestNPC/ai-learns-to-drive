@@ -3,7 +3,7 @@
     "show vectors": false,
     "highlight colliding": false,
     "show checkpoints": false,
-    "show start point": true,
+    "show start point": false,
     "show raycasts": false,
     "start paused": true
   },
@@ -19,7 +19,7 @@
     "braking force": 0.3,
     "base deceleration": 0.025,
     "steering response": 4,
-    "base grip": 0.1,
+    "base grip": 0.07,
     "angle snap threshold": 1,
     "max angle delta": 180
   },

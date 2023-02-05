@@ -12,11 +12,11 @@ from random import choice
 population_size = 5
 
 # Load configs
-with open('configs.json') as config_file:
+with open('configs.json', 'r') as config_file:
     configs = load(config_file)
 
 # Load tracks
-with open('tracks.json') as tracks_file:
+with open('tracks.json', 'r') as tracks_file:
     tracks = load(tracks_file)
 
 # Loops through all the AI cars and computes collisions for all of them
@@ -122,6 +122,8 @@ def fitness(genomes, config):
                     configs['debug']['show checkpoints'] = False if configs['debug']['show checkpoints'] else True
                 elif event.key == pg.K_v:
                     configs['debug']['show vectors'] = False if configs['debug']['show vectors'] else True
+                elif event.key == pg.K_h:
+                    configs['debug']['highlight colliding'] = False if configs['debug']['highlight colliding'] else True
 
         # Stops training if all AIs are dead
         if len(cars) == 0 or ticks_passed > max_generation_length:

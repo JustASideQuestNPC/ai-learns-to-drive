@@ -4,7 +4,7 @@ from json import load
 from math import sin, cos, radians
 
 # Import config file
-with open('configs.json') as config_file:
+with open('configs.json', 'r') as config_file:
     configs = load(config_file)
 
 class Raycaster:

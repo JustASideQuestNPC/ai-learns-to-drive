@@ -43,7 +43,7 @@ car_tab = [
         [sg.Text('Acceleration:'), sg.Spin([i for i in frange(0, 10, 0.1)], initial_value=configs['car']['acceleration'], key='-ACCELERATION-', size=5)],
         [sg.Text('Braking force:'), sg.Spin([i for i in frange(0, 10, 0.1)], initial_value=configs['car']['braking force'], key='-BRAKING_FORCE-', size=5)],
         [sg.Text('Steering response:'), sg.Spin([i for i in range(0, 180)], initial_value=configs['car']['steering response'], key='-STEERING_RESPONSE-', size=5)],
-        [sg.Text('Ground Friction:'), sg.Spin([i for i in frange(0, 10, 0.005)], initial_value=configs['car']['base deceleration'], key='-GROUND_FRICTION-', size=5)],
+        [sg.Text('Ground friction:'), sg.Spin([i for i in frange(0, 10, 0.005)], initial_value=configs['car']['base deceleration'], key='-GROUND_FRICTION-', size=5)],
         [sg.Text('Grip percentage:'), sg.Spin([i for i in range(0, 100)], initial_value=int(configs['car']['base grip'] * 100), key='-GRIP_PERCENTAGE-', size=5)],
         [sg.Text('Simulation speed (ticks/sec):'), sg.Spin([i for i in range(1, 1200)], initial_value=configs['training']['simulation speed'], key='-SIMULATION_SPEED-', size=5)]
 ]

@@ -124,6 +124,8 @@ def fitness(genomes, config):
                     configs['debug']['show vectors'] = False if configs['debug']['show vectors'] else True
                 elif event.key == pg.K_h:
                     configs['debug']['highlight colliding'] = False if configs['debug']['highlight colliding'] else True
+                elif event.key == pg.K_r:
+                    configs['debug']['show raycasts'] = False if configs['debug']['show raycasts'] else True
 
         # Stops training if all AIs are dead
         if len(cars) == 0 or ticks_passed > max_generation_length:

@@ -1,4 +1,5 @@
 import pygame as pg
+from pygame.locals import RESIZABLE
 from json import load
 from car import *
 from track import Track
@@ -14,7 +15,7 @@ with open('tracks.json', 'r') as tracks_file:
 
 # Create a window
 pg.init()
-window = pg.display.set_mode((1080, 720))
+window = pg.display.set_mode((1080, 720), RESIZABLE)
 pg.display.init()
 font = pg.font.SysFont('monospace', 24)
 

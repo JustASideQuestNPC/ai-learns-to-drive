@@ -1,4 +1,5 @@
 import pygame as pg
+from pygame.locals import RESIZABLE
 import json
 
 def multi_line_text(window, font, font_size, lines, start_coords = (5, 5)) -> None:
@@ -8,7 +9,7 @@ def multi_line_text(window, font, font_size, lines, start_coords = (5, 5)) -> No
 
 # Create a window
 pg.init()
-window = pg.display.set_mode((1080, 720))
+window = pg.display.set_mode((1080, 720), RESIZABLE)
 pg.display.init()
 
 # Used for displaying builder states and other info onscreen

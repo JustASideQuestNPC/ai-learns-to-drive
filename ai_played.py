@@ -1,4 +1,5 @@
 import pygame as pg
+from pygame.locals import RESIZABLE
 from json import load
 from car import Car
 from track import Track
@@ -62,7 +63,7 @@ def map_ranges(value, from_min, from_max, to_min, to_max):
 
 # Create a window
 pg.init()
-window = pg.display.set_mode((1080, 720))
+window = pg.display.set_mode((1080, 720), RESIZABLE)
 pg.display.init()
 
 font = pg.font.SysFont('monospace', 24)
@@ -78,7 +79,6 @@ def fitness(genomes, config):
     global generation
     global simulation_paused
     global configs
-    max_generation_length = configs['training']['max generation length']
 
     # Current track
     track = Track(window, choice(tracks))
@@ -100,6 +100,9 @@ def fitness(genomes, config):
     # Used to only count checkpoints once per lap
     passed_checkpoints = [[False for i in track.checkpoints] for c in cars]
     num_checkpoints_passed = [0 for c in cars]
+
+    # Used to kill AIs if they're too slow
+    speed_kill_timers = [configs['training']['slow ai kill timer'] for c in cars]
 
     ticks_passed = 0
 
@@ -128,7 +131,7 @@ def fitness(genomes, config):
                     configs['debug']['show raycasts'] = False if configs['debug']['show raycasts'] else True
 
         # Stops training if all AIs are dead
-        if len(cars) == 0 or ticks_passed > max_generation_length:
+        if len(cars) == 0:
             cars = []
             nets = []
             ge = []
@@ -137,6 +140,7 @@ def fitness(genomes, config):
             raycasters = []
             ray_distances = []
             collision_results = []
+            speed_kill_timers = []
             break
         
         # Do physics and AI calculations if the simulation isn't paused
@@ -160,33 +164,49 @@ def fitness(genomes, config):
                 collision_results = []
                 collision_results = collision_thread.result()
 
-                for i, res in enumerate(collision_results):
-                    colliding, passed_cp = res
+            # Go over collision results
+            for i, res in enumerate(collision_results):
+                colliding, passed_cp = res
+                car_dead = False
+                # Reward any AIs that passed a checkpoint 
+                if passed_cp != -1 and not passed_checkpoints[i][passed_cp] and not colliding:
+                    speed_multiplier = map_ranges(cars[i].current_speed, 0, configs['car']['top speed'],
+                                        1, configs['training']['checkpoint speed multiplier'])
+                    ge[i].fitness += configs['training']['checkpoint bonus'] * speed_multiplier
 
-                    if passed_cp != -1 and not passed_checkpoints[i][passed_cp] and not colliding:
-                        speed_multiplier = map_ranges(cars[i].current_speed, 0, configs['car']['top speed'],
-                                            1, configs['training']['checkpoint speed multiplier'])
-                        ge[i].fitness += configs['training']['checkpoint bonus'] * speed_multiplier
+                    num_checkpoints_passed[i] += 1
+                    passed_checkpoints[i][passed_cp] = True
+                    if num_checkpoints_passed[i] == len(passed_checkpoints[i]):
+                        num_checkpoints_passed[i] = 0
+                        passed_checkpoints[i] = [False for i in track.checkpoints]
+                
+                # Destroy cars if they hit a wall
+                if colliding:
+                    car_dead = True
+                else:
+                    ge[i].fitness += configs['training']['survival bonus']
 
-                        num_checkpoints_passed[i] += 1
-                        passed_checkpoints[i][passed_cp] = True
-                        if num_checkpoints_passed[i] == len(passed_checkpoints[i]):
-                            num_checkpoints_passed[i] = 0
-                            passed_checkpoints[i] = [False for i in track.checkpoints]
-                    
-                    # Destroy cars if they hit a wall
-                    if colliding:
-                        ge[i].fitness += configs['training']['death penalty']
-                        cars.pop(i)
-                        nets.pop(i)
-                        ge.pop(i)
-                        passed_checkpoints.pop(i)
-                        num_checkpoints_passed.pop(i)
-                        raycasters.pop(i)
-                        ray_distances.pop(i)
-                        collision_results.pop(i)
+                # Destroy cars if they go too slow for too long
+                if speed_kill_timers[i] <= 0:
+                    car_dead = True
+                else:
+                    # Decrease a car's timer if it goes too slow, otherwise reset it
+                    if cars[i].current_speed < configs['training']['minimum safe speed']:
+                        speed_kill_timers[i] -= 1
                     else:
-                        ge[i].fitness += configs['training']['survival bonus']
+                        speed_kill_timers[i] = configs['training']['slow ai kill timer']
+                
+                if car_dead:
+                    ge[i].fitness += configs['training']['death penalty']
+                    cars.pop(i)
+                    nets.pop(i)
+                    ge.pop(i)
+                    passed_checkpoints.pop(i)
+                    num_checkpoints_passed.pop(i)
+                    raycasters.pop(i)
+                    ray_distances.pop(i)
+                    collision_results.pop(i)
+                    speed_kill_timers.pop(i)
 
 
         # Display everything
@@ -208,7 +228,7 @@ def fitness(genomes, config):
 
         # Display some info on the current generation
         if not simulation_paused:
-            info_text = f'Running generation {generation} | {max_generation_length - ticks_passed} ticks until next generation.'
+            info_text = f'Running generation {generation}...'
         else:
             info_text = 'Simulation paused.'
 

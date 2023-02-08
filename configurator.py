@@ -39,7 +39,7 @@ debug_tab = [
         [sg.Text('Start with simulation paused:'), sg.Button(config_displays[4], key='-START_PAUSED-')]]
 
 car_tab = [
-        [sg.Text('Top speed:'), sg.Spin([i for i in range(1, 100)], initial_value=configs['car']['top speed'], key='-TOP_SPEED-', size=5)],
+        [sg.Text('Top speed:'), sg.Spin([i for i in frange(1, 50, 0.5)], initial_value=configs['car']['top speed'], key='-TOP_SPEED-', size=5)],
         [sg.Text('Acceleration:'), sg.Spin([i for i in frange(0, 10, 0.1)], initial_value=configs['car']['acceleration'], key='-ACCELERATION-', size=5)],
         [sg.Text('Braking force:'), sg.Spin([i for i in frange(0, 10, 0.1)], initial_value=configs['car']['braking force'], key='-BRAKING_FORCE-', size=5)],
         [sg.Text('Steering response:'), sg.Spin([i for i in range(0, 180)], initial_value=configs['car']['steering response'], key='-STEERING_RESPONSE-', size=5)],
@@ -55,6 +55,8 @@ training_tab = [
         [sg.Text('Death penalty'), sg.Spin([i for i in range(-50, 50)], initial_value=configs['training']['death penalty'], key='-DEATH_PENALTY-', size=5)],
         [sg.Text('Checkpoint bonus:'), sg.Spin([i for i in range(-50, 50)], initial_value=configs['training']['checkpoint bonus'], key='-CHECKPOINT_BONUS-', size=5)],
         [sg.Text('Checkpoint speed multiplier:'), sg.Spin([i for i in range(0, 10)], initial_value=configs['training']['checkpoint speed multiplier'], key='-CHECKPOINT_SPEED_MULTIPLIER-', size=5)],
+        [sg.Text('Minimum safe speed:'), sg.Spin([i for i in frange(0, configs['car']['top speed'], 0.1)], initial_value=configs['training']['minimum safe speed'], key='-MINIMUM_SAFE_SPEED-', size=5)],
+        [sg.Text('Slow AI kill timer (seconds):'), sg.Spin([i for i in frange(0, 15, 0.5)], initial_value=configs['training']['slow ai kill timer'] / configs['training']['simulation speed'], key='-SLOW_AI_TIMEOUT-', size=5)],
 ]
 
 layout = [[sg.TabGroup([
@@ -105,6 +107,8 @@ while True:
         configs['training']['death penalty'] = window['-DEATH_PENALTY-'].Get()
         configs['training']['checkpoint bonus'] = window['-CHECKPOINT_BONUS-'].Get()
         configs['training']['checkpoint speed multiplier'] = window['-CHECKPOINT_SPEED_MULTIPLIER-'].Get()
+        configs['training']['minimum safe speed'] = window['-MINIMUM_SAFE_SPEED-'].Get()
+        configs['training']['slow ai kill timer'] = window['-SLOW_AI_TIMEOUT-'].Get() * configs['training']['simulation speed']
 
         with open('configs.json', 'w') as config_file:
             json.dump(configs, config_file, indent=2)
